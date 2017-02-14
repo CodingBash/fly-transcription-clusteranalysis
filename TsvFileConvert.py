@@ -5,7 +5,7 @@ class GeneExpressionSet:
         self.geneName = ''
         self.rnaSeq = []
 
-with open('results.tsv','rb') as tsvin:
+with open('fullresults.tsv','rt') as tsvin:
     # Read TSV file
     tsvin = csv.reader(tsvin, delimiter='\t')
 
@@ -31,8 +31,10 @@ with open('results.tsv','rb') as tsvin:
     # Trim first entry of geneList (since empty)
     geneList = geneList[1:]
 
-    # Print data
-    print len(geneList)
+    
     for gene in geneList:
-        print gene.geneName
-        print gene.rnaSeq
+        print(gene.geneName)
+        print(gene.rnaSeq)
+
+    # Print data
+    print(len(geneList))
