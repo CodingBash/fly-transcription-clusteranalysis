@@ -1,9 +1,9 @@
-from genelist_creator import readFile, GeneExpressionSet
+from genelist_creator import read_file, GeneExpressionSet
 
 
 
 def main():
-    payload = readFile('fullresults.tsv')
+    payload = read_file('fullresults.tsv')
     geneList = payload[0]
     max = 0
     geneMax = GeneExpressionSet()
