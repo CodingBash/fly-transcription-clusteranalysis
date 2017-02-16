@@ -3,7 +3,7 @@ import csv
 class GeneExpressionSet:
     def __init__(self):
         self.geneName = ''
-        self.rnaSeq = []
+        self.rnaSeq = []    
 
 def read_file(filename):
     with open(filename,'rt') as tsvin:

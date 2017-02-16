@@ -12,11 +12,11 @@ class GeneExpressionSetCorrelation:
     def __lt__(self, other):
         return self.r_row < other.r_row
     def to_string(self):
-        return self.target_gene.geneName + " " + self.containing_gene.geneName + " " + str(self.r_row)
+        return self.target_gene.geneName + "," + self.containing_gene.geneName + "," + str(self.r_row)
         
-def main():
-    payload = read_file("fullresults.tsv")
-    input_gene = payload[0][0]
+def run_correlation(file, gene):
+    payload = read_file(file)
+    input_gene = find_gene(gene, payload[0])
     find_correlations(input_gene, payload[0])
     
 def find_correlations(input_gene, intermediate_gene_list):
@@ -26,11 +26,17 @@ def find_correlations(input_gene, intermediate_gene_list):
             continue
         # Determine how to utilize p_val (pearsonr[1])
         r_row, p_val = pearsonr(input_gene.rnaSeq, intermediate_gene.rnaSeq)
-        r_row = -1 if isnan(r_row) else r_row
-        pqueue.put((r_row, GeneExpressionSetCorrelation(input_gene, intermediate_gene, r_row, p_val)))
+        r_row = r_row if not isnan(r_row) else -1
+        pqueue.put((-r_row, GeneExpressionSetCorrelation(input_gene, intermediate_gene, r_row, p_val)))
+    count = 0
     while not pqueue.empty():
         item = pqueue.get()
+        if item[1].r_row < 0.8:
+            break
         print(item[1].to_string())
+        count += 1
+def find_gene(gene_name, gene_list):
+    for gene in gene_list:
+        if gene.geneName == gene_name:
+            return gene
         
-if __name__ == "__main__":
-    main()
