@@ -24,7 +24,6 @@ def find_correlations(input_gene, intermediate_gene_list):
     for intermediate_gene in intermediate_gene_list:
         if len(intermediate_gene.rnaSeq) != len(input_gene.rnaSeq):
             continue
-        # Determine how to utilize p_val (pearsonr[1])
         r_row, p_val = pearsonr(input_gene.rnaSeq, intermediate_gene.rnaSeq)
         r_row = r_row if not isnan(r_row) else -1
         pqueue.put((-r_row, GeneExpressionSetCorrelation(input_gene, intermediate_gene, r_row, p_val)))
