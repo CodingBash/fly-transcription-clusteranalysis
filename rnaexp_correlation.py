@@ -4,10 +4,11 @@ from queue import PriorityQueue
 from math import isnan
 
 class GeneExpressionSetCorrelation:
-    def __init__(self, target_gene, containing_gene, r_row):
+    def __init__(self, target_gene, containing_gene, r_row, p_val):
         self.target_gene = target_gene
         self.containing_gene = containing_gene
         self.r_row = r_row
+        self.p_val = p_val
     def __lt__(self, other):
         return self.r_row < other.r_row
     def to_string(self):
@@ -24,9 +25,9 @@ def find_correlations(input_gene, intermediate_gene_list):
         if len(intermediate_gene.rnaSeq) != len(input_gene.rnaSeq):
             continue
         # Determine how to utilize p_val (pearsonr[1])
-        r_row = pearsonr(input_gene.rnaSeq, intermediate_gene.rnaSeq)[0]
+        r_row, p_val = pearsonr(input_gene.rnaSeq, intermediate_gene.rnaSeq)
         r_row = -1 if isnan(r_row) else r_row
-        pqueue.put((r_row, GeneExpressionSetCorrelation(input_gene, intermediate_gene, r_row)))
+        pqueue.put((r_row, GeneExpressionSetCorrelation(input_gene, intermediate_gene, r_row, p_val)))
     while not pqueue.empty():
         item = pqueue.get()
         print(item[1].to_string())
