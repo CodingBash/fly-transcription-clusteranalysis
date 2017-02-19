@@ -1,9 +1,9 @@
 import csv
 
 class GeneExpressionSet:
-    def __init__(self):
-        self.geneName = ''
-        self.rnaSeq = []    
+    def __init__(self, geneName='', rnaSeq = []):
+        self.geneName = geneName
+        self.rnaSeq = rnaSeq
 
 def read_file(filename):
     with open(filename,'rt') as tsvin:

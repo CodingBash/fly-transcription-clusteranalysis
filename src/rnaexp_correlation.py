@@ -11,6 +11,8 @@ class GeneExpressionSetCorrelation:
         self.p_val = p_val
     def __lt__(self, other):
         return self.r_row < other.r_row
+    def set_rank(self, rank):
+        self.rank = rank
     def to_string(self):
         return self.target_gene.geneName + "," + self.containing_gene.geneName + "," + str(self.r_row)
         
@@ -19,7 +21,9 @@ def run_correlation(file, gene, corr_limit=0.3, output_file=""):
     input_gene = find_gene(gene, payload[0])
     find_correlations(input_gene, payload[0], corr_limit, output_file)
     
-def find_correlations(input_gene, intermediate_gene_list, corr_limit, output_file):
+# TODO: Fix the risk of NoneType
+# TODO: Add rank    
+def find_correlations(input_gene, intermediate_gene_list, corr_limit, output_file=""):
     output_to_file = len(output_file) > 0
     pqueue = PriorityQueue(len(intermediate_gene_list))
     for intermediate_gene in intermediate_gene_list:
@@ -42,6 +46,28 @@ def find_correlations(input_gene, intermediate_gene_list, corr_limit, output_fil
         count += 1
     if output_to_file:
         n_file.close();
+
+# TODO: Fix the risk of NoneType
+def find_correlations_simple(input_gene, intermediate_gene_list, corr_limit):
+    pqueue = PriorityQueue(len(intermediate_gene_list))
+    for intermediate_gene in intermediate_gene_list:
+        if len(intermediate_gene.rnaSeq) \
+              != len(input_gene.rnaSeq):
+            continue
+        r_row, p_val = pearsonr(input_gene.rnaSeq, intermediate_gene.rnaSeq)
+        r_row = r_row if not isnan(r_row) else -1
+        pqueue.put((-r_row, GeneExpressionSetCorrelation(input_gene, intermediate_gene, r_row, p_val)))
+    
+    correlation_list = []
+    count = 0
+    while not pqueue.empty():
+        item = pqueue.get()
+        if item[1].r_row < corr_limit:
+            break
+        correlation_list.append([item[1], count])
+        count += 1
+    return correlation_list
+        
 def find_gene(gene_name, gene_list):
     for gene in gene_list:
         if gene.geneName == gene_name:
