@@ -117,7 +117,47 @@ def find_correlations_simple(input_gene, intermediate_gene_list, corr_limit):
         count += 1
     return correlation_list
 
-
+# TODO: Fix the risk of NoneType
+def find_sanitized_correlations_simple(input_gene, intermediate_gene_list, corr_limit):
+    pqueue = PriorityQueue(len(intermediate_gene_list))
+    
+    #Sanitize input_gene rnaSeq data
+    input_gene_rnaSeq = []
+    for index in range(0, len(input_gene.rnaSeq)):
+        if input_gene.rnaSeq[index] != 0:
+            input_gene_rnaSeq.append([index, input_gene.rnaSeq[index]])
+                
+            
+            
+    for intermediate_gene in intermediate_gene_list:
+        if len(intermediate_gene.rnaSeq) \
+              != len(input_gene.rnaSeq):
+            continue
+        
+        # From input_gene sanitized data, sanitize the intermediate gene
+        input_gene_rnaSeq_index = 0
+        intermediate_gene_rnaSeq = []
+        for index in range(0, len(intermediate_gene.rnaSeq)):
+            if index == input_gene_rnaSeq[input_gene_rnaSeq_index][0]:
+                intermediate_gene_rnaSeq.append([index, intermediate_gene.rnaSeq[index]])
+                if input_gene_rnaSeq[input_gene_rnaSeq_index][0] != input_gene_rnaSeq[len(input_gene_rnaSeq)-1][0]:
+                    input_gene_rnaSeq_index += 1
+                
+                
+        # Take pearsonr of tuples' second column (1st when 0-based)
+        r_row, p_val = pearsonr([item[1] for item in input_gene_rnaSeq], [item[1] for item in intermediate_gene_rnaSeq])
+        r_row = r_row if not isnan(r_row) else -1
+        pqueue.put((-r_row, GeneExpressionSetCorrelation(input_gene, intermediate_gene, r_row, p_val)))
+    
+    correlation_list = []
+    count = 0
+    while not pqueue.empty():
+        item = pqueue.get()
+        if item[1].r_row < corr_limit:
+            break
+        correlation_list.append([item[1], count])
+        count += 1
+    return correlation_list
         
 def find_gene(gene_name, gene_list):
     for gene in gene_list:
