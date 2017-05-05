@@ -1,6 +1,7 @@
 from genelist_creator import read_file
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 
+# Creates XML from data where each rna stage is a new child element
 def create_xml(input_filename, output_filename, is_prettify=True, gene_count=-1 ):
     payload = read_file(input_filename)
     data = payload[0]
@@ -29,6 +30,8 @@ def create_xml(input_filename, output_filename, is_prettify=True, gene_count=-1 
         file.write(str(tostring(root)))
     file.close()
 
+# Creates XML from data where each rna stage is in the same child element but comma delimited
+# This is preferred since file size is greatly reduced
 def create_xml_simple(input_filename, output_filename, is_prettify=True, gene_count=-1 ):
     payload = read_file(input_filename)
     data = payload[0]
@@ -59,6 +62,11 @@ def create_xml_simple(input_filename, output_filename, is_prettify=True, gene_co
 from xml.etree import ElementTree
 from xml.dom import minidom
 
+#
+# Input = Element Tree
+# Intermediate process = Converts element tree to string, then uses mindom to prettyify string which becomes the output
+# output = String prettified
+#
 def prettify(elem):
     rough_string = ElementTree.tostring(elem, 'utf-8')
     reparsed = minidom.parseString(rough_string)
