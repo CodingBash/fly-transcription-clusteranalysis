@@ -32,6 +32,12 @@ def create_xml(input_filename, output_filename, is_prettify=True, gene_count=-1 
 
 # Creates XML from data where each rna stage is in the same child element but comma delimited
 # This is preferred since file size is greatly reduced
+#
+# PARAMS
+# input_filename = Input TSV file that will be given to read_file() (read documentation over there)
+# output_filename = the output XML file
+# is_prettify = Boolean representing whether the XML file should be prettified
+# gene_count = limit of how many genes should be included in the XML. -1 is all genes in TSV
 def create_xml_simple(input_filename, output_filename, is_prettify=True, gene_count=-1 ):
     payload = read_file(input_filename)
     data = payload[0]
@@ -44,7 +50,11 @@ def create_xml_simple(input_filename, output_filename, is_prettify=True, gene_co
             break
         if len(entry.rnaSeq) == 104:
             gene_child = SubElement(root, "gene")
+            gene_db_id_child = SubElement(gene_child, "gene-db-id")
+            gene_sec_id_child = SubElement(gene_child, "gene-sec-id")
             gene_name_child = SubElement(gene_child, "gene-name")
+            gene_db_id_child.text = entry.dbIdentifier
+            gene_sec_id_child.text = entry.secondaryIdentifier
             gene_name_child.text = entry.geneName
             rna_exp_child = SubElement(gene_child, "rna-exp")
             rna_exp_text = ""
@@ -71,5 +81,11 @@ def prettify(elem):
     rough_string = ElementTree.tostring(elem, 'utf-8')
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
+
+
+if __name__ == '__main__':
+    # The input file contains all RNA expression data for all genes available in D. m
+    create_xml_simple("../res/results_w_more_ids.tsv", "../res/genedata_w_ids.xml")
+    #read_file("../res/results_w_more_ids.tsv")
         
              
