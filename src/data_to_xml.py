@@ -60,7 +60,7 @@ def rna_exp_marshall_xml_simple(input_filename, output_filename, is_prettify=Tru
             rna_exp_text = ""
             for rna_exp_stage in entry.rnaSeq:
                 rna_exp_text += str(rna_exp_stage) + ","
-            rna_exp_child.text = rna_exp_text[:-1]
+            rna_exp_child.text = rna_exp_text[:-1] # This removes the comma at the end
             outer_count += 1
     file = open(output_filename, 'w')
     if is_prettify:
@@ -70,23 +70,23 @@ def rna_exp_marshall_xml_simple(input_filename, output_filename, is_prettify=Tru
     file.close()
                 
 # Creates XML from data. This will marshall the the gene information (gene ID, secondary ID, name, and synonyms) to an XML
-#
+# The synonyms will be csv instead of separate childs to reduce file size
 # PARAMS
 # input_filename = Input TSV file that will be given to read_file() (read documentation over there)
 # output_filename = the output XML file
 # is_prettify = Boolean representing whether the XML file should be prettified
 # gene_count = limit of how many genes should be included in the XML. -1 is all genes in TSV
 def gene_id_marshall_xml_simple(input_filename, output_filename, is_prettify=True, gene_count=-1 ):
-    payload = read_file_rnadata(input_filename)
+    payload = read_file_geneid(input_filename)
     data = payload[0]
-    root = Element("genome")
+    root = Element("genome-gene-ids")
     root.set('version', '1.0.0')
-    root.append(Comment("Generated XML"))
+    root.append(Comment("Generated XML by @CodingBash"))
     outer_count = 0;
     for entry in data:
         if gene_count != -1 and outer_count > gene_count:
             break
-        if len(entry.rnaSeq) == 104:
+        else:
             gene_child = SubElement(root, "gene")
             gene_db_id_child = SubElement(gene_child, "gene-db-id")
             gene_sec_id_child = SubElement(gene_child, "gene-sec-id")
@@ -94,11 +94,11 @@ def gene_id_marshall_xml_simple(input_filename, output_filename, is_prettify=Tru
             gene_db_id_child.text = entry.dbIdentifier
             gene_sec_id_child.text = entry.secondaryIdentifier
             gene_name_child.text = entry.geneName
-            rna_exp_child = SubElement(gene_child, "rna-exp")
-            rna_exp_text = ""
-            for rna_exp_stage in entry.rnaSeq:
-                rna_exp_text += str(rna_exp_stage) + ","
-            rna_exp_child.text = rna_exp_text[:-1]
+            synonyms_child = SubElement(gene_child, "synonyms")
+            synonyms_text = ""
+            for synonym in entry.synonyms:
+                synonyms_text += str(synonym) + "\t" # tab separated instead of csv in case of intermediate commas
+            synonyms_child.text = synonyms_text[:-1] # This removes the comma at the end
             outer_count += 1
     file = open(output_filename, 'w')
     if is_prettify:
@@ -126,7 +126,10 @@ def prettify(elem):
 
 if __name__ == '__main__':
     # The input file contains all RNA expression data for all genes available in D. m
-    rna_exp_marshall_xml_simple("../res/tsv_files/rna_data_limited_ids.tsv", "../res/xml_files/genome-rna-data-1.xml")
+    
+    #rna_exp_marshall_xml_simple("../res/tsv_files/rna_data_limited_ids.tsv", "../res/xml_files/genome-rna-data-1.xml")
+    gene_id_marshall_xml_simple("../res/tsv_files/gene_identifiers.tsv", "../res/xml_files/genome-gene-id-data-1.xml")
+    
     #read_file("../res/results_w_more_ids.tsv")
         
              

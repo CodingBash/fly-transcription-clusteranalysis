@@ -85,7 +85,7 @@ def read_file_geneid(filename):
                 gene.secondaryIdentifier = row[1]
                 gene.geneName = row[2]
                 
-            synonyms.append(int(row[4]))
+            synonyms.append(row[3])
             count += 1
         geneList = geneList[1:]
         return [geneList, 0, max]
