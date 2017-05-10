@@ -127,7 +127,7 @@ def prettify(elem):
 if __name__ == '__main__':
     # The input file contains all RNA expression data for all genes available in D. m
     
-    #rna_exp_marshall_xml_simple("../res/tsv_files/rna_data_limited_ids.tsv", "../res/xml_files/genome-rna-data-1.xml")
+    rna_exp_marshall_xml_simple("../res/tsv_files/rna_data_limited_ids.tsv", "../res/xml_files/genome-rna-data-1.xml")
     gene_id_marshall_xml_simple("../res/tsv_files/gene_identifiers.tsv", "../res/xml_files/genome-gene-id-data-1.xml")
     
     #read_file("../res/results_w_more_ids.tsv")
