@@ -32,7 +32,8 @@ def run_all_correlation():
                 if tf_data == None or gene_data == None:
                     continue
                 r_row, p_val = pearsonr(tf_data.rnaSeq, gene_data.rnaSeq)
-                print(str(tf) + " - " + str(gene) + ": " + str(r_row))
+                if not isnan(r_row) and r_row > 0.75:
+                    print(str(tf) + " - " + str(gene) + ": " + str(r_row))
 
         
 def run_correlation(file, gene, corr_limit=0.3, output_file=""):
