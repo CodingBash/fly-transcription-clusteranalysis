@@ -1,7 +1,8 @@
-from genelist_creator import read_file
+from genelist_creator import read_file_rnadata, read_file_geneid
 from scipy.stats.stats import pearsonr
 from queue import PriorityQueue
 from math import isnan
+from d_id_conv import Preferences, retrieve_gene_name_facilitator as rgf
 
 class GeneExpressionSetCorrelation:
     def __init__(self, target_gene, containing_gene, r_row, p_val):
@@ -15,6 +16,24 @@ class GeneExpressionSetCorrelation:
         self.rank = rank
     def to_string(self):
         return self.target_gene.geneName + "," + self.containing_gene.geneName + "," + str(self.r_row)
+        
+    
+def run_all_correlation():
+    import json
+    payload = read_file_rnadata("../res/tsv_files/rna_data_limited_ids.tsv")
+    with open('../res/training_set_data/training_set_results.json') as data_file:    
+        data = json.load(data_file)
+        for tf, value in data.items():
+            for gene, _ in value.items():
+                tf_data = find_gene(rgf(input_term=tf, input_filenames=["../res/flymine_id_list_4.tsv"], 
+                        preferences=Preferences(prefer_small_gene_names=True, prefer_first_selection_on_multiple=True, prefer_remember_selection=True, prefer_output=False, prefer_gene_db_id=True)), payload[0])
+                gene_data = find_gene(rgf(input_term=gene, input_filenames=["../res/flymine_id_list_4.tsv"], 
+                        preferences=Preferences(prefer_small_gene_names=True, prefer_first_selection_on_multiple=True, prefer_remember_selection=True, prefer_output=False, prefer_gene_db_id=True)), payload[0])
+                if tf_data == None or gene_data == None:
+                    continue
+                r_row, p_val = pearsonr(tf_data.rnaSeq, gene_data.rnaSeq)
+                print(str(tf) + " - " + str(gene) + ": " + str(r_row))
+
         
 def run_correlation(file, gene, corr_limit=0.3, output_file=""):
     payload = read_file(file)
@@ -159,8 +178,11 @@ def find_sanitized_correlations_simple(input_gene, intermediate_gene_list, corr_
         count += 1
     return correlation_list
         
-def find_gene(gene_name, gene_list):
+def find_gene(dbIdentifier, gene_list):
     for gene in gene_list:
-        if gene.geneName == gene_name:
+        if gene.dbIdentifier == dbIdentifier:
             return gene
         
+        
+if __name__ == "__main__":
+    run_all_correlation()

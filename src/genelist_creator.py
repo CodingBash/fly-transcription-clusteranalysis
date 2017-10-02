@@ -2,8 +2,9 @@ import csv
 from pprint import pprint
 
 class GeneRnaDataSet:
-    def __init__(self, dbIdentifier='', rnaSeq = []):
+    def __init__(self, dbIdentifier='', geneName = '', rnaSeq = []):
         self.dbIdentifier = dbIdentifier
+        self.geneName = geneName
         self.rnaSeq = rnaSeq
     def __str__(self):
         return self.dbIdentifier + " " +  str(self.rnaSeq)
@@ -14,9 +15,9 @@ class GeneIdentifierSet:
         self.secondaryIdentifier = secondaryIdentifier
         self.geneName = geneName
         self.synonyms = synonyms
-        
-    
-# Works    
+
+
+# Works
 # Unmarshalls a TSV file containing gene's expression stage values
 #
 # Takes in a TSV file with 5 columns
@@ -31,7 +32,7 @@ class GeneIdentifierSet:
 # COL 1: RNA Expression Stage
 # COL 2: RNA Expression Score
 #
-# Returns a List of GeneExpressionSet objects 
+# Returns a List of GeneExpressionSet objects
 #
 # This method usually acts as a subroutine for another method, not a standolone function
 def read_file_rnadata(filename):
@@ -49,7 +50,7 @@ def read_file_rnadata(filename):
                 gene = GeneRnaDataSet()
                 rnaSeq = []
                 gene.dbIdentifier = geneString = row[0]
-                
+
             rnaSeq.append(int(row[2]))
             count += 1
         geneList = geneList[1:]
@@ -64,7 +65,7 @@ def read_file_rnadata(filename):
 # COL 2: Gene Name
 # COL 3: Gene Synonym
 #
-# Returns a List of GeneExpressionSet objects 
+# Returns a List of GeneExpressionSet objects
 #
 # This method usually acts as a subroutine for another method, not a standolone function
 def read_file_geneid(filename):
@@ -84,8 +85,8 @@ def read_file_geneid(filename):
                 gene.dbIdentifier = geneString = row[0]
                 gene.secondaryIdentifier = row[1]
                 gene.geneName = row[2]
-                
-            synonyms.append(row[3])
+
+            #synonyms.append(row[3])
             count += 1
         geneList = geneList[1:]
         return [geneList, 0, max]
@@ -93,21 +94,10 @@ def read_file_geneid(filename):
 if __name__ == '__main__':
     # This file contains all RNA expression data for all genes available in D. m
     #read_file("../res/results_w_more_ids.tsv") To access deprecated read_file method, go to commit #db4a6ee
-    
+
     for geneRnaDataSet in read_file_rnadata("../res/tsv_files/rna_data_limited_ids.tsv"):
         print(geneRnaDataSet.dbIdentifier)
-    #pprint(read_file_geneid("../res/tsv_files/gene_identifiers.tsv"))          
-    
+    #pprint(read_file_geneid("../res/tsv_files/gene_identifiers.tsv"))
+
     # This will not work on new code since it lacks all required columns. Refer to old version of code
     # read_file("../res/results_w_more_ids.tsv")
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
